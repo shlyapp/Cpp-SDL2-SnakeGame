@@ -10,14 +10,7 @@
 
 int main(int argc, char* args[]) {
 
-	// Создаем меню игры
-	Menu menu;
+	Game game;
 
-	// Если меню закрыли, создаем игру
-	if (!menu.is_showing())
-	{
-		Game game;
-	}
-	
 	return 0;
 }
