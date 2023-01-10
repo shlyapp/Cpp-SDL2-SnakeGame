@@ -9,6 +9,8 @@ RecordsData::RecordsData() {
 }
 
 void RecordsData::load() {
+	records.clear();
+
 	// Открываем файл на чтение
 	std::ifstream file("records.txt");
 	// Значение из файла
@@ -50,6 +52,7 @@ void RecordsData::add_record(int value) {
 }
 
 std::vector<int> RecordsData::get_best_records(int number) {
+	load();
 	std::vector<int> output;
 
 	// Сортируем по возрастанию рекорды

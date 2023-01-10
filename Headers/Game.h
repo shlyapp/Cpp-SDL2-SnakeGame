@@ -35,6 +35,8 @@ private:
 	// Змейка
 	Snake snake;
 
+	Menu* menu = NULL;
+
 	// Рекорды пользователя
 	RecordsData records;
 
@@ -70,6 +72,8 @@ private:
 public:
 	Game();
 	~Game();
+
+	void init();
 
 	/// <summary>
 	/// Главный игровок цикл

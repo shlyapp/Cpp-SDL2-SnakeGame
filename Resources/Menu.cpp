@@ -182,6 +182,6 @@ void Menu::controller(SDL_Event& event) {
 	}
 }
 
-bool Menu::is_showing() {
-	return menu_showing;
+bool Menu::is_closing() {
+	return close;
 }

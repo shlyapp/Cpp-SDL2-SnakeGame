@@ -16,6 +16,25 @@
 Game::Game()
 	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }) {
 
+	menu = new Menu;
+
+	if (menu->is_closing()) {
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+		SDL_Quit();
+	}
+	else {
+		init();
+	}
+
+	
+}
+Game::~Game() {
+	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
+}
+
+void Game::init() {
 #pragma region Иницализция окна игры, рендера и шрифта
 
 	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
@@ -46,7 +65,7 @@ Game::Game()
 		utils::print_sdl_error("An error occured while trying to load the score font.");
 
 #pragma endregion
-	
+
 	// Инициалация змейки
 	snake = Snake(utils::vector2f(200, 200), (float)SNAKE_SIZE);
 
@@ -107,12 +126,6 @@ Game::Game()
 
 	// Закрываем окно и шрифт, с которым работали
 	SDL_Quit();
-	TTF_CloseFont(score_font);
-	TTF_Quit();
-}
-Game::~Game() {
-	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(renderer);
 }
 
 void Game::game_loop() {
@@ -157,28 +170,29 @@ void Game::game_loop() {
 			for (unsigned int i = 1; i < snake_body.size(); ++i) {
 				// Проверяем на столкновени с самой собой
 				if (snake.get_head().get_pos() == snake_body[i].get_pos()) {
-					// Если произошло такое столкновение, то игра начинается заново
-					snake = Snake(utils::vector2f(200, 200), (float)SNAKE_SIZE);
-					// Добавляем рекорд
+					// уничитожаем активное окно
+					SDL_DestroyWindow(window);
+					SDL_DestroyRenderer(renderer);
+
+					// сохраняем рекорд и возвращаемся к исходным настройкам
 					records.add_record(player_score);
-					// Обнуляем счетчик
 					player_score = 0;
-					// Очищаем текущие фрукты на игровом поле
-					fruits.clear();
-					// Возвращаем изначальную скорость генерации
 					generation_speed = 100;
-					// Добавляем фрукт
-					add_fruit();
+					fruits.clear();
+					snake = Snake(utils::vector2f(200, 200), (float)SNAKE_SIZE);
+					
+					menu = new Menu;
+					
+					if (menu->is_closing()) {
+						SDL_DestroyWindow(window);
+						SDL_DestroyRenderer(renderer);
+						SDL_Quit();
+					}
+					else {
+						init();
+					}
 
-					// Очищаем поверхность и выводим надпись
-					std::string score_str = "YOUR SCORE: " + std::to_string(player_score);
-
-					SDL_FreeSurface(surface_score);
-					surface_score = TTF_RenderText_Solid(score_font, score_str.c_str(), { 255, 255, 255 });
-
-					SDL_DestroyTexture(score_texture);
-					score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
-					break;
+					return;
 				}
 			}
 

@@ -92,8 +92,8 @@ public:
 	void handle_click(Button* btn);
 
 	/// <summary>
-	/// Показывается ли меню
+	/// Закрыто ли меню
 	/// </summary>
 	/// <returns></returns>
-	bool is_showing();
+	bool is_closing();
 };
