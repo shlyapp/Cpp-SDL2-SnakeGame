@@ -43,13 +43,9 @@ private:
 	SDL_Rect records_rect;
 	SDL_Texture* records_texture = NULL;
 
-	SDL_Surface* info_surface = NULL;
-	SDL_Rect info_rect;
-	SDL_Texture* info_texture = NULL;
-
-	SDL_Surface* game_surface = NULL;
-	SDL_Rect game_rect;
-	SDL_Texture* game_texture = NULL;
+	SDL_Surface* scr;
+	SDL_Surface* about_surface = NULL;
+	SDL_Rect about_rect;
 
 #pragma endregion
 

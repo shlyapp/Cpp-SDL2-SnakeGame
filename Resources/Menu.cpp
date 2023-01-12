@@ -3,6 +3,7 @@
 #include "Game.h"
 #include <algorithm>
 #include "Button.h"
+#include "SDL_image.h"
 
 Menu::Menu() {
 #pragma region Иницализция окна игры, рендера и шрифта
@@ -26,6 +27,13 @@ Menu::Menu() {
 		SDL_Quit();
 		return;
 	}
+
+	//if ()
+	scr = SDL_GetWindowSurface(window);
+	about_surface = IMG_Load("about.png");
+	about_surface = SDL_ConvertSurface(about_surface, scr->format, NULL);
+
+	about_rect = { 0, 0, 800, 600 };
 
 	if (TTF_Init() == -1)
 		utils::print_sdl_error("An error occured while trying to use TTF_Init().");
@@ -54,14 +62,6 @@ Menu::Menu() {
 	records_surface = TTF_RenderText_Solid(font, "Records", { 255, 255, 255 });
 	records_texture = SDL_CreateTextureFromSurface(renderer, records_surface);
 	records_rect = { 185, 40, 415, 160 };
-
-	info_surface = TTF_RenderText_Solid(font, "About", { 255, 255, 255 });
-	info_texture = SDL_CreateTextureFromSurface(renderer, info_surface);
-	info_rect = { 185, 40, 415, 160 };
-
-	game_surface = TTF_RenderText_Solid(font, "Use arrows for move snake", { 255, 255, 255 });
-	game_texture = SDL_CreateTextureFromSurface(renderer, game_surface);
-	game_rect = { 145, 190, 515, 100 };
 
 #pragma endregion
 
@@ -133,8 +133,8 @@ void Menu::render() {
 	}
 	case menuType::info: {
 		// Выводим информацию о игре
-		SDL_RenderCopy(renderer, info_texture, NULL, &info_rect);
-		SDL_RenderCopy(renderer, game_texture, NULL, &game_rect);
+		SDL_BlitScaled(about_surface, NULL, scr, &about_rect);
+		SDL_UpdateWindowSurface(window);
 		break;
 	}
 	case menuType::exit: {
