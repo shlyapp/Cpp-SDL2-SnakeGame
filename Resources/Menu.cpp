@@ -42,15 +42,15 @@ Menu::Menu() {
 
 	RecordsData recordsData;
 	// Получаем 5 последних лушчих рекордов
-	std::vector<int> records = recordsData.get_best_records(5);
+	std::vector<std::string> records = recordsData.get_best_records(5);
 	font = TTF_OpenFont("arial.ttf", 200);
 
-	// Создаем текст для вывода рекордов
+	
 	for (int i = 0; i < 5; i++) {
-		std::string text = std::to_string(i + 1) + ". " + std::to_string(records[i]) + " scores";
+		std::string text = std::to_string(i + 1) + ". " + records[i] + " scores";
 		score_surfaces[i] = TTF_RenderText_Solid(font, text.c_str(), {255, 255, 255});
 		score_textures[i] = SDL_CreateTextureFromSurface(renderer, score_surfaces[i]);
-		score_rect[i] = { 285, 200 + i * 50, 220, 50 };
+		score_rect[i] = { 245, 200 + i * 50, 300, 50 };
 	}
 
 #pragma region Создание текста для заголовкой пунктов меню
@@ -75,6 +75,9 @@ Menu::Menu() {
 	for (auto button : buttons) {
 		button->add_listener(this);
 	}
+
+	button_esc = new Button({ 10, 10, 80, 50 }, "<-", renderer);
+	button_esc->add_listener(this);
 
 #pragma endregion
 
@@ -126,6 +129,7 @@ void Menu::render() {
 	case menuType::records: {
 		// Выводим все рекорды
 		SDL_RenderCopy(renderer, records_texture, NULL, &records_rect);
+		button_esc->render(renderer);
 		for (int i = 0; i < 5; i++) {
 			SDL_RenderCopy(renderer, score_textures[i], NULL, &score_rect[i]);
 		}
@@ -150,6 +154,11 @@ void Menu::render() {
 
 void Menu::handle_click(Button* button)
 {
+	if (button == button_esc) {
+		type = menuType::normal;
+		return;
+	}
+
 	// Находим, какая кнопка из кнопок меню была нажата
 	int i = 0;
 	for (auto btn : buttons) {
@@ -168,6 +177,8 @@ void Menu::controller(SDL_Event& event) {
 		for (auto button : buttons) {
 			button->update(event);
 		}
+
+		button_esc->update(event);
 
 		// Событие закрытик окна
 		if (event.type == SDL_QUIT) {

@@ -13,7 +13,7 @@
 /// <summary>
 /// Класс, описывающий логику игры
 /// </summary>
-class Game {
+class Game : IEventListener{
 private:
 	// Размер экрана
 	const unsigned int SCREEN_WIDTH = 800;
@@ -61,8 +61,20 @@ private:
 	SDL_Surface* surface_score = NULL;
 	SDL_Rect score_rect_dest;
 	SDL_Texture* score_texture = NULL;
+
+	SDL_Surface* gameover_surface = NULL;
+	SDL_Rect gameover_rect;
+	SDL_Texture* gameover_texture = NULL;
+
+	SDL_Surface* result_surface = NULL;
+	SDL_Rect result_rect;
+	SDL_Texture* result_texture = NULL;
+
 	TTF_Font* score_font = NULL;
 	const unsigned int FONT_SCORE_SIZE = 15;
+
+	Button* user_name_button;
+	Button* save_button;
 
 #pragma endregion
 
@@ -95,4 +107,8 @@ public:
 	/// Добавить новый фрукт на поле
 	/// </summary>
 	void add_fruit();
+
+	void show_gameover();
+
+	void handle_click(Button* btn);
 };

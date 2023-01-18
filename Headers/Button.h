@@ -1,68 +1,81 @@
 #pragma once
-
 #include <string>
 #include <list>
 
 class Button;
 
 /// <summary>
-/// Абастрактный класс, реализующий паттерн "Слушатель"
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
 /// </summary>
-class IEventListener {
+class IEventListener
+{
 protected:
-	IEventListener() {};
+	IEventListener(){};
 
 public:
 	/// <summary>
-	/// Обработка нажатия на кнопку
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	/// </summary>
-	/// <param name="button">Кнопка, которая вызвала это событие</param>
-	virtual void handle_click(Button* button) = 0;
+	/// <param name="button">пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+	virtual void handle_click(Button *button) = 0;
 };
 
-class Button {
+class Button
+{
 private:
-	// Прямоугольник кнопки
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	SDL_Rect rect;
-	// Прямоугольник для текста
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	SDL_Rect rect_text;
 
-	// Поверхность, текстура и шрифт для текста
-	SDL_Surface* surface = NULL;
-	SDL_Texture* texture = NULL;
-	TTF_Font* font = NULL;
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	SDL_Surface *surface = NULL;
+	SDL_Texture *texture = NULL;
+	TTF_Font *font = NULL;
 
-	std::vector<IEventListener*> listeners;
+	std::string text;
+
+	std::vector<IEventListener *> listeners;
 
 public:
 	/// <summary>
-	/// Графический элемент кнопка 
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	/// </summary>
-	/// <param name="rect">Размер и положение</param>
-	/// <param name="text">Текст для отображения</param>
-	/// <param name="renderer">Рендер</param>
-	Button(SDL_Rect rect, std::string text, SDL_Renderer* renderer);
+	/// <param name="rect">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+	/// <param name="text">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+	/// <param name="renderer">пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+	Button(SDL_Rect rect, std::string text, SDL_Renderer *renderer);
 
 	/// <summary>
-	/// Обновление состояния
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	/// </summary>
-	/// <param name="event">Событие SDL</param>
-	void update(SDL_Event& event);
+	/// <param name="event">пїЅпїЅпїЅпїЅпїЅпїЅпїЅ SDL</param>
+	bool update(SDL_Event &event);
 
 	/// <summary>
-	/// Вывод на экран
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	/// </summary>
-	/// <param name="renderer">Рендер</param>
-	void render(SDL_Renderer* renderer);
+	/// <param name="renderer">пїЅпїЅпїЅпїЅпїЅпїЅ</param>
+	void render(SDL_Renderer *renderer);
 
 	/// <summary>
-	/// Добавить слушателя событий
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	/// </summary>
-	/// <param name="lisener">Сулшатель</param>
-	void add_listener(IEventListener* lisener);
+	/// <param name="lisener">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+	void add_listener(IEventListener *lisener);
 
 	/// <summary>
-	/// Оповестить слушателей о событии 
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	/// </summary>
 	void notify_listener();
+
+	/// <summary>
+	/// РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С‚РµРєСЃС‚ РґР»СЏ РєРЅРѕРїРєРё
+	/// </summary>
+	void set_text(std::string text, SDL_Renderer *renderer);
+
+	/// <summary>
+	/// РџРѕР»СѓС‡РёС‚СЊ С‚РµРєСЃС‚ РЅР° РєРЅРѕРїРєРµ
+	/// </summary>
+	std::string get_text();
 };

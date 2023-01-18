@@ -1,53 +1,89 @@
 #include "Game.h"
 
-Button::Button(SDL_Rect rect, std::string text, SDL_Renderer* renderer) {
-	// Присваиваем положение кнопке
+Button::Button(SDL_Rect rect, std::string text, SDL_Renderer *renderer)
+{
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	this->rect = rect;
 
-	// Открываем шрифт для вывода текста
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	font = TTF_OpenFont("arial.ttf", 200);
-	// Задаем положение для текста на кнопке (считается середина кнопки)
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
 	rect_text = {rect.x + ((rect.w) / 2) - (((int)text.length() * 30) / 2), rect.y + (rect.h / 2) - 20, (int)text.length() * 30, 40};
 
-	// Поверхность для текста
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	surface = TTF_RenderText_Solid(font, text.c_str(), {255, 255, 255});
-	// Текстура для текста
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 }
 
-void Button::update(SDL_Event& event) {
-	// Если произошло нажатие на кнопку мыши
-	if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-		// Получаем координаты курсора мыши
+bool Button::update(SDL_Event &event)
+{
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
+	{
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		Sint32 x = event.button.x;
 		Sint32 y = event.button.y;
 
-		// Проверяем, находится ли курсор мыши в зоне кнопки
-		if (x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h)) {
-			// Оповещаем слушателей о том, что произошло нажатие на кнопку
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+		if (x >= rect.x && x <= (rect.x + rect.w) && y >= rect.y && y <= (rect.y + rect.h))
+		{
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			notify_listener();
+			return true;
 		}
 	}
+
+	return false;
 }
 
-void Button::render(SDL_Renderer* renderer) {
-	// Устанавливаем необхомый цвет
+void Button::render(SDL_Renderer *renderer)
+{
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	SDL_SetRenderDrawColor(renderer, 58, 180, 73, 0xFF);
-	// Отрисовка прямоугольника кнопки
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	SDL_RenderFillRect(renderer, &rect);
 
-	// Отрисовка текста
-	SDL_RenderCopy(renderer, texture, NULL, &rect_text);		
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	SDL_RenderCopy(renderer, texture, NULL, &rect_text);
 }
 
-void Button::add_listener(IEventListener* listener) {
+void Button::add_listener(IEventListener *listener)
+{
 	listeners.push_back(listener);
 }
 
-void Button::notify_listener() {
-	// Оповещаем каждого слушателя
+void Button::notify_listener()
+{
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	for (auto listener : listeners)
 	{
 		listener->handle_click(this);
 	}
+}
+
+void Button::set_text(std::string text, SDL_Renderer *renderer)
+{
+	SDL_Rect rect_text_new;
+	// РЎС‡РёС‚Р°РµРј СЂР°Р·РјРµСЂ С‚РµРєСЃС‚Р°
+	rect_text_new = {rect.x + ((rect.w) / 2) - (((int)text.length() * 30) / 2), rect.y + (rect.h / 2) - 20, (int)text.length() * 30, 40};
+
+	// Р•СЃР»Рё С‚РµРєСЃС‚ РЅРµ РїРѕРјРµС‰Р°РµС‚СЃСЏ РЅР° РєРЅРѕРїРєСѓ
+	if (rect_text_new.w > rect.w)
+	{
+		return;
+	}
+
+	rect_text = rect_text_new;
+
+	this->text = text;
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	surface = TTF_RenderText_Solid(font, text.c_str(), {255, 255, 255});
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
+}
+
+std::string Button::get_text()
+{
+	return this->text;
 }

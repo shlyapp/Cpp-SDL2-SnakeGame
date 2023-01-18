@@ -60,6 +60,7 @@ private:
 
 	// Лист кнопок для взаимодействия
 	std::list<Button*> buttons;
+	Button* button_esc;
 
 public:
 	Menu();

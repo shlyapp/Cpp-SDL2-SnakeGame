@@ -12,46 +12,51 @@
 #include "Menu.h"
 #include "Object.h"
 
-
 Game::Game()
-	:background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({ 0,0,0,0 }) {
+	: background_rows(SCREEN_HEIGHT / SNAKE_SIZE), background_cols(SCREEN_WIDTH / SNAKE_SIZE), toolbar({0, 0, 0, 0})
+{
 
 	menu = new Menu;
 
-	if (menu->is_closing()) {
+	if (menu->is_closing())
+	{
 		SDL_DestroyWindow(window);
 		SDL_DestroyRenderer(renderer);
 		SDL_Quit();
 	}
-	else {
+	else
+	{
 		init();
 	}
-
-	
 }
-Game::~Game() {
+Game::~Game()
+{
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 }
 
-void Game::init() {
-#pragma region Иницализция окна игры, рендера и шрифта
+void Game::init()
+{
+#pragma region пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
-	if (SDL_Init(SDL_INIT_VIDEO) > 0) {
+	if (SDL_Init(SDL_INIT_VIDEO) > 0)
+	{
 		utils::print_sdl_error("An error occured while trying to init sdl video.");
 		SDL_Quit();
 		return;
 	}
 
 	window = SDL_CreateWindow(APPLICATION_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	if (window == NULL) {
+	if (window == NULL)
+	{
 		utils::print_sdl_error("An error occured while trying to create the window.");
 		SDL_Quit();
 		return;
 	}
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (renderer == NULL) {
+	if (renderer == NULL)
+	{
 		utils::print_sdl_error("An error occured while trying to create the renderer.");
 		SDL_Quit();
 		return;
@@ -66,146 +71,135 @@ void Game::init() {
 
 #pragma endregion
 
-	// Инициалация змейки
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	snake = Snake(utils::vector2f(200, 200), (float)SNAKE_SIZE);
 
-	// Инициалзируем прямоугольники заднего фона
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	SDL_Rect square;
-	// Ширина и высота, как и змеи
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ
 	square.w = square.h = SNAKE_SIZE;
 	unsigned int x = 0, y = 0;
-	// Проходим циклом по строчкам
-	for (unsigned int i = 0; i < background_rows; ++i) {
-		// Задаем координаты
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	for (unsigned int i = 0; i < background_rows; ++i)
+	{
+		// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		x = (i & 1) ? 0 : SNAKE_SIZE;
 		square.y = y;
 
-		// Проходим циклом по столбцам
-		for (unsigned int j = (i & 1) ? 0 : 1; j < background_cols; ++j) {
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		for (unsigned int j = (i & 1) ? 0 : 1; j < background_cols; ++j)
+		{
 			square.x = x;
 
 			background.push_back(square);
 
-			// Увелививаем координаты для следующего прямоугольника (тайла)
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ)
 			x += SNAKE_SIZE * 2;
 		}
 
 		y += SNAKE_SIZE;
 	}
 
-	// Настройка размеров области для вывода количества очков
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	toolbar.x = toolbar.y = 0;
 	toolbar.w = SCREEN_WIDTH;
 	toolbar.h = TOOLBAR_HEIGHT;
 
 	srand((unsigned int)time(NULL));
 
-	// Добавляем первый фрукт
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	fruits.push_back(new Fruit);
 
-	// Случайным обрахом выбираем координаты ячейки
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	fruits[0]->position.x = (float)(rand() % (background_cols - 1));
 	fruits[0]->position.y = (float)(rand() % (background_rows - 1) + (TOOLBAR_HEIGHT / SNAKE_SIZE));
 
-	// Задаем координаты в формате экрана и размер фрукты
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	fruits[0]->rect.x = (int)(fruits[0]->position.x * SNAKE_SIZE);
 	fruits[0]->rect.y = (int)(fruits[0]->position.y * SNAKE_SIZE);
 	fruits[0]->rect.w = fruits[0]->rect.h = SNAKE_SIZE;
 
-	// Поверхность и текстура для вывода количество очков
-	surface_score = TTF_RenderText_Solid(score_font, "YOUR SCORE: 0", { 255, 255, 255 });
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	surface_score = TTF_RenderText_Solid(score_font, "YOUR SCORE: 0", {255, 255, 255});
 	score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
-	// Размеры надписи о количестве очков
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	score_rect_dest.x = 20;
 	score_rect_dest.y = TOOLBAR_HEIGHT / 2 - FONT_SCORE_SIZE;
 	score_rect_dest.h = 20;
 	score_rect_dest.w = 0;
 
-	// Запускаем главный игровой цикд
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	game_loop();
 
-	// Закрываем окно и шрифт, с которым работали
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	SDL_Quit();
 }
 
-void Game::game_loop() {
+void Game::game_loop()
+{
 
-	// Изменение времени для обновления
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	const float delta_time = 0.1f;
 
-	// Текущее время 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	float current_time = utils::hire_time_in_seconds(),
-		accumulator = 0.0f;
+		  accumulator = 0.0f;
 
-	// Событие 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	SDL_Event event;
 
-	// Цикл, пока игры запушена
-	while (game_running) {
+	// пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	while (game_running)
+	{
 
-		// Получаем текушее время
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		float new_time = utils::hire_time_in_seconds(),
-			// Находим время кадра
+			  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			frame_time = new_time - current_time;
-		// Обновляем текущее время
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		current_time = new_time;
 
 		accumulator += frame_time;
 
-		// Проверка на столкновение
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		bool is_check = false;
 
-		// Время для обновления
-		while (accumulator >= delta_time) {
-			// Получаем все тело змейки
+		// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		while (accumulator >= delta_time)
+		{
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			std::vector<Object> snake_body = snake.get_snake_body();
 
-			// Обрабатываем события, если они есть
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 			controller(event);
 
-			// Двигаем змею
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 			snake.walk(SCREEN_WIDTH, SCREEN_HEIGHT, TOOLBAR_HEIGHT);
 
-			// Проходимся по каждому звену змеики (части тела)
-			for (unsigned int i = 1; i < snake_body.size(); ++i) {
-				// Проверяем на столкновени с самой собой
-				if (snake.get_head().get_pos() == snake_body[i].get_pos()) {
-					// уничитожаем активное окно
-					SDL_DestroyWindow(window);
-					SDL_DestroyRenderer(renderer);
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ)
+			for (unsigned int i = 1; i < snake_body.size(); ++i)
+			{
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+				if (snake.get_head().get_pos() == snake_body[i].get_pos())
+				{
 
-					// сохраняем рекорд и возвращаемся к исходным настройкам
-					records.add_record(player_score);
-					player_score = 0;
-					generation_speed = 100;
-					fruits.clear();
-					snake = Snake(utils::vector2f(200, 200), (float)SNAKE_SIZE);
-					
-					menu = new Menu;
-					
-					if (menu->is_closing()) {
-						SDL_DestroyWindow(window);
-						SDL_DestroyRenderer(renderer);
-						SDL_Quit();
-					}
-					else {
-						init();
-					}
-
-					return;
+					show_gameover();
 				}
 			}
 
-			// Проходимся по каждому фрукту
-			for (auto fruit : fruits) {
-				// Если время жизни фрукта истекло, то удаляем его
-				if (fruit->is_time_over()) {
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+			for (auto fruit : fruits)
+			{
+				// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+				if (fruit->is_time_over())
+				{
 					auto it = std::remove(fruits.begin(), fruits.end(), fruit);
 					fruits.erase(it, fruits.end());
 
-					// Если на игрвовом поле осталось меньше 2 фруктов,
-					// то добавляем фрукт
-					if (fruits.size() < 2) {
+					// пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+					// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+					if (fruits.size() < 2)
+					{
 						add_fruit();
 					}
 
@@ -213,46 +207,51 @@ void Game::game_loop() {
 				}
 			}
 
-			// С некой вероятностью, зависящей от скорости генерации
-			// создаем новый фрукт на поле
-			if ((1 + rand() % generation_speed) == 1) {
+			// пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
+			if ((1 + rand() % generation_speed) == 1)
+			{
 				add_fruit();
 			}
 
-			// Если еще не было стокновения с фруктов
-			if (!is_check) {
-				// Проходимся по всем фруктам
-				for (auto fruit : fruits) {
+			// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+			if (!is_check)
+			{
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+				for (auto fruit : fruits)
+				{
 
-					// Проверяем на совпадение положения фрукта с положением головы змейки
-					if (snake.get_head().get_pos() == utils::vector2f((float)fruit->rect.x, (float)fruit->rect.y)) {
+					// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+					if (snake.get_head().get_pos() == utils::vector2f((float)fruit->rect.x, (float)fruit->rect.y))
+					{
 
-						// Скармливем змейке
+						// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 						snake.feed();
 
-						// Обновялем счетчик очков в зависимости от типа фрукта
+						// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 						if (fruit->get_type() == fruitType::Red)
 							player_score++;
 						else
 							player_score += 5;
 
-						// Увеличваем шанс генерации фруктов
-						if (generation_speed - 5 > 0) {
+						// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+						if (generation_speed - 5 > 0)
+						{
 							generation_speed -= 5;
 						}
 
-						// Удаляем фрукт, с которым столкнулась змейка
+						// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 						auto it = std::remove(fruits.begin(), fruits.end(), fruit);
 						fruits.erase(it, fruits.end());
 
-						// Добавляем новый фрукт за место старого
+						// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 						add_fruit();
 
-						// Обновляем надпись о количестве очков
+						// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 						std::string score_str = "YOUR SCORE: " + std::to_string(player_score);
 
 						SDL_FreeSurface(surface_score);
-						surface_score = TTF_RenderText_Solid(score_font, score_str.c_str(), { 255, 255, 255 });
+						surface_score = TTF_RenderText_Solid(score_font, score_str.c_str(), {255, 255, 255});
 
 						SDL_DestroyTexture(score_texture);
 						score_texture = SDL_CreateTextureFromSurface(renderer, surface_score);
@@ -266,112 +265,218 @@ void Game::game_loop() {
 			accumulator -= delta_time;
 		}
 
-		// Выводим измененное изображением
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		render();
 	}
 }
 
-void Game::add_fruit() {
-	// Получаем все тело змеи
+void Game::add_fruit()
+{
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	std::vector<Object> snake_tail = snake.get_snake_body();
-	// Корректна ли данная позиция
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool is_valid_position = false;
 
-	// Новый фрукт
-	Fruit* new_fruit = new Fruit;
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	Fruit *new_fruit = new Fruit;
 
-	// Если позиция не корректна (то есть позиция фрукта совпадает с позицией змеи)
-	while (!is_valid_position) {
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ)
+	while (!is_valid_position)
+	{
 		is_valid_position = true;
 
-		// Случайным образом выбираем ячейки карты для фрукта
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		new_fruit->position.x = (float)(rand() % (background_cols - 1));
 		new_fruit->position.y = (float)(rand() % (background_rows - 1) + (TOOLBAR_HEIGHT / SNAKE_SIZE));
 
-		// Проверяем не занята ли эта ячейка змеей
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		for (unsigned int i = 0; i < snake_tail.size(); ++i)
 			if (snake_tail[i].get_pos() == utils::vector2f((float)(new_fruit->position.x * SNAKE_SIZE), (float)(new_fruit->position.y * SNAKE_SIZE)))
 				is_valid_position = false;
 	}
 
-	// Задаем реальные координаты на экране
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	new_fruit->rect.x = (int)(new_fruit->position.x * SNAKE_SIZE);
 	new_fruit->rect.y = (int)(new_fruit->position.y * SNAKE_SIZE);
 	new_fruit->rect.w = new_fruit->rect.h = SNAKE_SIZE;
 
-	// Добавляем к остальным фруктам
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	fruits.push_back(new_fruit);
 }
 
-void Game::render() {
+void Game::handle_click(Button *btn)
+{
+	if (btn == save_button)
+	{
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		records.add_record(player_score, user_name_button->get_text());
+		player_score = 0;
+		generation_speed = 100;
+		fruits.clear();
+		snake = Snake(utils::vector2f(200, 200), (float)SNAKE_SIZE);
+
+		menu = new Menu;
+
+		if (menu->is_closing())
+		{
+			SDL_DestroyWindow(window);
+			SDL_DestroyRenderer(renderer);
+			SDL_Quit();
+			game_running = false;
+		}
+		else
+		{
+			init();
+		}
+
+		return;
+	}
+}
+
+// РџРѕРєР°Р·С‹РІР°РµРј СЃС‚СЂР°РЅРёС†Сѓ СЃ РѕРєРѕРЅС‡Р°РЅРёРµРј РёРіСЂС‹
+void Game::show_gameover()
+{
+
+	score_font = TTF_OpenFont("arial.ttf", 1000);
+	std::string scores = "YOUR SCORE: " + std::to_string(player_score);
+	result_surface = TTF_RenderText_Solid(score_font, scores.c_str(), {255, 255, 255});
+	result_texture = SDL_CreateTextureFromSurface(renderer, result_surface);
+	result_rect = {300, 200, 200, 50};
+
+	gameover_surface = TTF_RenderText_Solid(score_font, "Game Over", {255, 255, 255});
+	gameover_texture = SDL_CreateTextureFromSurface(renderer, gameover_surface);
+	gameover_rect = {125, 50, 550, 150};
+
+	user_name_button = new Button({175, 300, 450, 100}, "", renderer);
+	save_button = new Button({275, 425, 250, 70}, "Save", renderer);
+	save_button->add_listener(this);
+
+	while (true)
+	{
+		SDL_Event event;
+
+		while (SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_QUIT)
+			{
+				SDL_DestroyWindow(window);
+				SDL_DestroyRenderer(renderer);
+				game_running = false;
+				return;
+			}
+
+			if (event.type == SDL_TEXTINPUT)
+			{
+				user_name_button->set_text(user_name_button->get_text() + event.text.text, renderer);
+			}
+
+			if (save_button->update(event))
+			{
+				return;
+			}
+		}
+
+		SDL_SetRenderDrawColor(renderer, 42, 130, 53, 255);
+		SDL_RenderClear(renderer);
+
+		user_name_button->render(renderer);
+		save_button->render(renderer);
+
+		SDL_RenderCopy(renderer, result_texture, NULL, &result_rect);
+		SDL_RenderCopy(renderer, gameover_texture, NULL, &gameover_rect);
+
+		SDL_RenderPresent(renderer);
+	}
+}
+
+void Game::render()
+{
 	SDL_SetRenderDrawColor(renderer, 42, 130, 53, 255);
-	// Очищаем окно
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	SDL_RenderClear(renderer);
 
-	// Выводим каждую ячейку карты
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	SDL_SetRenderDrawColor(renderer, 58, 180, 73, 255);
 	for (unsigned int i = 0; i < background.size(); ++i)
 		SDL_RenderFillRect(renderer, &background[i]);
 
-	// Выводим область под количество очков
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	SDL_SetRenderDrawColor(renderer, 42, 130, 53, 255);
 	SDL_RenderFillRect(renderer, &toolbar);
 
-	// Выводим фрукты
-	for (auto fruit : fruits) {
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	for (auto fruit : fruits)
+	{
 		fruit->render(renderer);
 	}
 
-	// Выводим голову
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	snake.render(renderer);
 
-	// Выводим количество очков
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	SDL_RenderCopy(renderer, score_texture, NULL, &score_rect_dest);
 
 	SDL_RenderPresent(renderer);
 }
 
-void Game::controller(SDL_Event& event) {
-	// Проверка на события
-	while (SDL_PollEvent(&event)) {
-		// Событие закрытие окна
+void Game::controller(SDL_Event &event)
+{
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	while (SDL_PollEvent(&event))
+	{
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		if (event.type == SDL_QUIT)
 			game_running = false;
 
-		// Если нажата какая-то клавиша
-		if (event.type == SDL_KEYDOWN) {
-			// В зависимости от клавиши, меняем направление змейки
-			switch (event.key.keysym.sym) {
-			case SDLK_UP: {
-				// Проверяем на противополжное движение, чтобы не было столкновения 
-				if (snake.get_head_direction() == utils::directions::DOWN) break;
+		// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		if (event.type == SDL_KEYDOWN)
+		{
+			// пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+			switch (event.key.keysym.sym)
+			{
+			case SDLK_UP:
+			{
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+				if (snake.get_head_direction() == utils::directions::DOWN)
+					break;
 
 				snake.change_head_direction(utils::directions::UP);
 
 				break;
 			}
-			case SDLK_DOWN: {
-				if (snake.get_head_direction() == utils::directions::UP) break;
+			case SDLK_DOWN:
+			{
+				if (snake.get_head_direction() == utils::directions::UP)
+					break;
 
 				snake.change_head_direction(utils::directions::DOWN);
 
 				break;
 			}
-			case SDLK_LEFT: {
-				if (snake.get_head_direction() == utils::directions::RIGHT) break;
+			case SDLK_LEFT:
+			{
+				if (snake.get_head_direction() == utils::directions::RIGHT)
+					break;
 
 				snake.change_head_direction(utils::directions::LEFT);
 
 				break;
 			}
-			case SDLK_RIGHT: {
-				if (snake.get_head_direction() == utils::directions::LEFT) break;
+			case SDLK_RIGHT:
+			{
+				if (snake.get_head_direction() == utils::directions::LEFT)
+					break;
 
 				snake.change_head_direction(utils::directions::RIGHT);
 
 				break;
 			}
-			case SDLK_f: {
+			case SDLK_f:
+			{
 				snake.feed();
 				break;
 			}
